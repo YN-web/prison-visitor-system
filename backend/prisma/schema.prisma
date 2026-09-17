@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+}
+
+model User {
+  id             String          @id @default(uuid())
+  fullName       String
+  nationalId     String          @unique
+  phoneNumber    String          @unique
+  email          String          @unique
+  passwordHash   String
+  profilePhoto   String?
+  isActive       Boolean         @default(true)
+  visitorProfile VisitorProfile?
+
+  prisonId String?
+  prison   Prison? @relation(fields: [prisonId], references: [id])
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  approvedVisits Visit[] @relation("VisitApprover")
+}
+
+model VisitorProfile {
+  id            String @id @default(uuid())
+  visitorNumber String @unique
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id])
+
+  visits Visit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Prison {
+  id       String  @id @default(uuid())
+  name     String
+  location String?
+  isActive Boolean @default(true)
+
+  inmates    Inmate[]
+  visitSlots VisitSlot[]
+
+  staffUsers User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Inmate {
+  id           String  @id @default(uuid())
+  inmateNumber String  @unique
+  fullName     String
+  prisonId     String
+  prison       Prison  @relation(fields: [prisonId], references: [id])
+  isActive     Boolean @default(true)
+
+  visits Visit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Visit {
+  id        String @id @default(uuid())
+  visitorId String
+  inmateId  String
+
+  slotId String?
+  slot   VisitSlot? @relation(fields: [slotId], references: [id])
+
+  visitor VisitorProfile @relation(fields: [visitorId], references: [id])
+  inmate  Inmate         @relation(fields: [inmateId], references: [id])
+
+  visitDate DateTime
+  status    VisitStatus @default(PENDING)
+
+  purpose         String?
+  rejectionReason String?
+  visitPass       VisitPass?
+
+  documents VisitDocument[]
+
+  approvedById String?
+  approvedBy   User?     @relation("VisitApprover", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
+
+  checkedInAt  DateTime?
+  checkedOutAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum VisitStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHECKED_IN
+  CHECKED_OUT
+  COMPLETED
+  NO_SHOW
+}
+
+model VisitSlot {
+  id       String @id @default(uuid())
+  prisonId String
+  prison   Prison @relation(fields: [prisonId], references: [id])
+
+  startTime DateTime
+  endTime   DateTime
+  capacity  Int
+  isActive  Boolean  @default(true)
+  visits    Visit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VisitPass {
+  id      String @id @default(uuid())
+  visitId String @unique
+  visit   Visit  @relation(fields: [visitId], references: [id])
+
+  qrCode    String   @unique
+  issuedAt  DateTime @default(now())
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model VisitDocument {
+  id String @id @default(uuid())
+
+  visitId String
+  visit   Visit  @relation(fields: [visitId], references: [id])
+
+  fileName String
+  fileUrl  String
+  fileType String?
+
+  uploadedAt DateTime @default(now())
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  title   String
+  message String
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  action   String
+  entity   String
+  entityId String?
+  details  String?
+
+  createdAt DateTime @default(now())
+}
