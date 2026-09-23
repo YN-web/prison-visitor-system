@@ -32,4 +32,5 @@ export class AuthController {
 getMe(@Request() request: any) {
   return request.user;
 }
+  
 }

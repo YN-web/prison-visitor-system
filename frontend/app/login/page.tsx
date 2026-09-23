@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const [showPassword, setShowPassword] = useState(false);
-const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   if (!email.trim()) {
@@ -25,16 +25,43 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   }
 
   if (!password) {
-  alert(`${t("password")}: ${t("requiredField")}`);
-  return;
-}
+    alert(`${t("password")}: ${t("requiredField")}`);
+    return;
+  }
 
-if (password.length < 8) {
-  alert(t("passwordTooShort"));
-  return;
-}
+  if (password.length < 8) {
+    alert(t("passwordTooShort"));
+    return;
+  }
 
-alert(t("loginReady"));
+  try {
+    const response = await fetch("http://localhost:3000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Login failed");
+      return;
+    }
+
+    localStorage.setItem("accessToken", data.accessToken);
+
+    alert(t("loginReady"));
+
+    console.log("Logged in user:", data.user);
+  } catch (error) {
+    console.error(error);
+    alert("Unable to connect to the server");
+  }
 };
   return (
     <main className="min-h-screen bg-white text-[#1a2a3a] dark:bg-gray-900 dark:text-white">
