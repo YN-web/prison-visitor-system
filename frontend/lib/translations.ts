@@ -112,6 +112,42 @@ export const translations = {
     dontHaveAccount: "Don't have an account?",
     registerHere: "Register here",
     loginReady: "Login information is ready to be sent to the server.",
+
+        // Staff Login
+    staffLoginTitle: "Staff Login",
+    staffLoginSubtitle: "Login to access the prison management portal.",
+    staffLogin: "Staff Login",
+    staffOnly: "This login is for authorized prison staff only.",
+    invalidStaffAccount: "This account does not have staff access.",
+    staffLoginFailed: "Login failed. Please check your email and password.",
+    serverConnectionError: "Unable to connect to the server.",
+
+
+        // Staff Portal
+    staffPortal: "Staff Portal",
+    welcomeBack: "Welcome back",
+    managementDescription:
+      "Manage prison visitors, visit requests, inmates, and daily operations from this portal.",
+    visitManagement: "Visit Management",
+    visitorManagement: "Visitor Management",
+    inmateManagement: "Inmate Management",
+    prisonManagement: "Prison Management",
+    gateCheckIn: "Gate / Check-in",
+    reports: "Reports",
+    notifications: "Notifications",
+    recentActivity: "Recent Activity",
+    recentActivityDescription:
+      "Recent visitor and visit activity will appear here.",
+    noRecentActivity: "No recent activity.",
+    totalVisitors: "Total Visitors",
+    todaysVisits: "Today's Visits",
+    pendingRequests: "Pending Requests",
+    approvedVisits: "Approved Visits",
+    checkedIn: "Checked-In",
+    completed: "Completed",
+    rejected: "Rejected",
+    noShows: "No-Shows",
+    staffPortalSystem: "Prison Visitor Management System",
   },
   rw: {
     // Navigation
@@ -226,6 +262,42 @@ export const translations = {
     dontHaveAccount: "Ntabwo ufite konti?",
     registerHere: "Iyandikishe hano",
     loginReady: "Amakuru yo kwinjira yiteguye koherezwa kuri seriveri.",
+
+
+        // Staff Login
+    staffLoginTitle: "Kwinjira kw'Umukozi",
+    staffLoginSubtitle: "Injira kugira ngo ugere kuri sisitemu y'ubuyobozi bwa gereza.",
+    staffLogin: "Kwinjira kw'Umukozi",
+    staffOnly: "Uku kwinjira kugenewe abakozi ba gereza babifitiye uburenganzira gusa.",
+    invalidStaffAccount: "Iyi konti ntabwo yemerewe kugera kuri sisitemu y'abakozi.",
+    staffLoginFailed: "Kwinjira byanze. Reba imeyili n'ijambo ry'ibanga.",
+    serverConnectionError: "Ntibishoboye guhuza na seriveri.",
+
+        // Staff Portal
+    staffPortal: "Urubuga rw'Abakozi",
+    welcomeBack: "Murakaza neza",
+    managementDescription:
+      "Gucunga abasuye gereza, ubusabe bwo gusura, imfungwa n'imirimo ya buri munsi ukoresheje uru rubuga.",
+    visitManagement: "Gucunga Ibisura",
+    visitorManagement: "Gucunga Abasuye",
+    inmateManagement: "Gucunga Imfungwa",
+    prisonManagement: "Gucunga Gereza",
+    gateCheckIn: "Irembo / Kwinjira",
+    reports: "Raporo",
+    notifications: "Amatangazo",
+    recentActivity: "Ibikorwa Biheruka",
+    recentActivityDescription:
+      "Ibikorwa biheruka by'abasuye n'ibisura bizagaragara hano.",
+    noRecentActivity: "Nta bikorwa biheruka.",
+    totalVisitors: "Abasuye Bose",
+    todaysVisits: "Ibisura by'Uyu Munsi",
+    pendingRequests: "Ubusabe Butegereje",
+    approvedVisits: "Ibisura Byemejwe",
+    checkedIn: "Abinjiye",
+    completed: "Byarangiye",
+    rejected: "Byanzwe",
+    noShows: "Abatitabiriye",
+    staffPortalSystem: "Sisitemu yo Gucunga Abasuye muri Gereza",
 
   },
 };

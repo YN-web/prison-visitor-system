@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import { useState } from "react";
 import { Eye, EyeOff, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
 const { t } = useLanguage();
+const router = useRouter();
 const [fullName, setFullName] = useState("");
 const [nationalId, setNationalId] = useState("");
 const [phoneNumber, setPhoneNumber] = useState("");
@@ -19,7 +21,7 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
 const passwordsMatch = password === confirmPassword;
 
-const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   if (!fullName.trim()) {
@@ -57,7 +59,35 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     return;
   }
 
-  alert(t("registrationReady"));
+  try {
+    const response = await fetch("http://localhost:3000/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fullName,
+        nationalId,
+        phoneNumber,
+        email,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Registration failed");
+      return;
+    }
+
+    alert("Account created successfully");
+    router.push("/login");
+  
+  } catch (error) {
+    console.error(error);
+    alert("Unable to connect to the server");
+  }
 };
 
   return (

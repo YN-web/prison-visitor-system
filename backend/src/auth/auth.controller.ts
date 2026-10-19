@@ -1,17 +1,18 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Request,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { Roles } from './roles.decorator';
-import { RolesGuard } from './roles.guard';
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -23,14 +24,38 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const result = await this.authService.login(loginDto);
+
+    response.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
+
+    return result;
   }
- @Get('me')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('VISITOR')
-getMe(@Request() request: any) {
-  return request.user;
-}
-  
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@Request() request: any) {
+    return this.authService.getMe(request.user.userId);
+  }
+
+  @Delete('logout')
+  logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+
+    return {
+      message: 'Logout successful',
+    };
+  }
 }
