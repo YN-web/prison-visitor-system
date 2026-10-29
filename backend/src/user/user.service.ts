@@ -92,4 +92,46 @@ export class UserService {
       },
     };
   }
+
+  async findAllStaff() {
+  const staff = await this.prisma.user.findMany({
+    where: {
+      role: {
+        name: {
+          not: 'VISITOR',
+        },
+      },
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      phoneNumber: true,
+      role: {
+        select: {
+          name: true,
+        },
+      },
+      prison: {
+        select: {
+          name: true,
+        },
+      },
+      isActive: true,
+    },
+    orderBy: {
+      fullName: 'asc',
+    },
+  });
+
+  return staff.map((user) => ({
+    id: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    role: user.role.name,
+    prison: user.prison?.name ?? null,
+    isActive: user.isActive,
+  }));
+}
 }

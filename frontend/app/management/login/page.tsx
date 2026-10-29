@@ -53,7 +53,7 @@ export default function StaffLoginPage() {
     try {
       // Login
       const loginResponse = await fetch(
-        "http://localhost:3000/auth/login",
+        "http://localhost:3000/auth/login?type=staff",
         {
           method: "POST",
           credentials: "include",
@@ -76,7 +76,7 @@ export default function StaffLoginPage() {
 
       // Get the currently logged-in user
       const meResponse = await fetch(
-        "http://localhost:3000/auth/me",
+        "http://localhost:3000/auth/staff-me",
         {
           method: "GET",
           credentials: "include",
@@ -92,10 +92,10 @@ export default function StaffLoginPage() {
 
       // Make sure this is a staff account
       if (!STAFF_ROLES.includes(meData.role)) {
-        await fetch("http://localhost:3000/auth/logout", {
-          method: "DELETE",
-          credentials: "include",
-        });
+        await fetch("http://localhost:3000/auth/logout?type=staff", {
+       method: "DELETE",
+        credentials: "include",
+      });
 
         alert(t("invalidStaffAccount"));
         return;
@@ -218,7 +218,7 @@ export default function StaffLoginPage() {
             </form>
           </div>
 
-          {/* Back to visitor login */}
+          {/* Back to visitor login 
           <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             <Link
               href="/login"
@@ -226,7 +226,7 @@ export default function StaffLoginPage() {
             >
               {t("backToHome")}
             </Link>
-          </p>
+          </p>*/}
 
         </div>
       </div>

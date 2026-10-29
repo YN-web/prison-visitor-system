@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -7,21 +8,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request) => {
-          const path = request?.originalUrl || request?.url || '';
+  (request) => {
+    const path =
+      request?.originalUrl || request?.url || '';
 
-          // Management routes use the staff cookie
-          if (path.startsWith('/management')) {
-            return request?.cookies?.staffAccessToken;
-          }
+    // Staff routes
+    if (
+      path.startsWith('/auth/staff-me') ||
+      path.startsWith('/management') ||
+      path.startsWith('/user')||
+      path.startsWith('/gate-duty')||
+      path.startsWith('/gate-operations')||
+      path.startsWith('/inmate')
+    
+    ) {
+      return request?.cookies?.staffAccessToken;
+    }
 
-          // Visitor routes use the visitor cookie
-          return request?.cookies?.visitorAccessToken;
-        },
-      ]),
+    // Visitor routes
+    return request?.cookies?.visitorAccessToken;
+  },
+]),
 
       ignoreExpiration: false,
-
       secretOrKey: process.env.JWT_SECRET!,
     });
   }

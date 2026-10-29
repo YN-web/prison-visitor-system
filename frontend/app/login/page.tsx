@@ -44,7 +44,7 @@ export default function LoginPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/auth/login",
+        "http://localhost:3000/auth/login?type=visitor",
         {
           method: "POST",
           credentials: "include",
@@ -68,14 +68,14 @@ export default function LoginPage() {
       // Only visitors can use this login page
       if (data.user?.role !== "VISITOR") {
         await fetch(
-          "http://localhost:3000/auth/logout",
+           "http://localhost:3000/auth/logout?type=visitor",
           {
             method: "DELETE",
             credentials: "include",
           },
         );
 
-        alert(t("invalidVisitorAccount"));
+        alert(("invalidVisitorAccount"));
         return;
       }
 

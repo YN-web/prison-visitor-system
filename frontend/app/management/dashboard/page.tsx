@@ -77,7 +77,7 @@ export default function ManagementDashboard() {
     const loadUser = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/auth/me",
+          "http://localhost:3000/auth/staff-me",
           {
             credentials: "include",
           },
@@ -91,7 +91,7 @@ export default function ManagementDashboard() {
         const data = await response.json();
 
         if (!STAFF_ROLES.includes(data.role)) {
-  await fetch("http://localhost:3000/auth/logout", {
+  await fetch("http://localhost:3000/auth/logout?type=staff", {
     method: "DELETE",
     credentials: "include",
   });
@@ -146,18 +146,19 @@ export default function ManagementDashboard() {
   }, []);
 
   // Logout
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:3000/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error(error);
-    }
+ const handleLogout = async () => {
+  try {
+    await fetch("http://localhost:3000/auth/logout?type=staff", {
+      method: "DELETE",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
-    router.push("/management/login");
-  };
+  router.push("/management/login");
+  router.refresh();
+};
 
   if (loading) {
     return (

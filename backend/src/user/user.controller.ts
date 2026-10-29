@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Post,
+  Get,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -23,4 +24,11 @@ export class UserController {
   ) {
     return this.userService.createStaff(createStaffDto);
   }
+
+  @Get()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+findAllStaff() {
+  return this.userService.findAllStaff();
+}
 }

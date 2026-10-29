@@ -46,6 +46,7 @@ model User {
   auditLogs     AuditLog[]
 
   approvedVisits Visit[] @relation("VisitApprover")
+  gateDutyAssignments GateDutyAssignment[]
 }
 
 model VisitorProfile {
@@ -70,6 +71,7 @@ model Prison {
   visitSlots VisitSlot[]
 
   staffUsers User[]
+  gateDutyAssignments GateDutyAssignment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,7 +174,7 @@ model VisitDocument {
 }
 
 model Notification {
-  id String @id @default(uuid())
+  id String @id @default(uuid())   
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
@@ -196,4 +198,32 @@ model AuditLog {
   details  String?
 
   createdAt DateTime @default(now())
+}
+
+model GateDutyAssignment {
+  id String @id @default(uuid())
+
+  staffId String
+  staff   User   @relation(fields: [staffId], references: [id])
+
+  prisonId String
+  prison   Prison @relation(fields: [prisonId], references: [id])
+
+  dutyDate DateTime
+  shift    GateShift
+
+  isActive Boolean @default(true)
+
+  assignedById String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([staffId, dutyDate])
+  @@index([prisonId, dutyDate])
+}
+
+enum GateShift {
+  MORNING
+  AFTERNOON
+  NIGHT
 }

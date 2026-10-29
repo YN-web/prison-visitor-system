@@ -1,11 +1,14 @@
+
 import {
   Body,
   Controller,
   Delete,
   Get,
   Post,
+  Query,
   Request,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
@@ -26,18 +29,55 @@ export class AuthController {
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
+    @Query('type') type: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.login(loginDto);
+    if (type !== 'visitor' && type !== 'staff') {
+      throw new UnauthorizedException(
+        'Specify the login type: visitor or staff',
+      );
+    }
 
-    response.cookie('accessToken', result.accessToken, {
+    const result = await this.authService.login(loginDto);
+    const isVisitor = result.user.role === 'VISITOR';
+
+    if (type === 'visitor' && !isVisitor) {
+      throw new UnauthorizedException(
+        'This account is not a visitor account',
+      );
+    }
+
+    if (type === 'staff' && isVisitor) {
+      throw new UnauthorizedException(
+        'This account is not a staff account',
+      );
+    }
+
+    const cookieName =
+      type === 'visitor'
+        ? 'visitorAccessToken'
+        : 'staffAccessToken';
+
+    response.cookie(cookieName, result.accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
       maxAge: 60 * 60 * 1000,
+      path: '/',
     });
 
-    return result;
+    // Remove the old shared cookie.
+    response.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return {
+      message: result.message,
+      user: result.user,
+    };
   }
 
   @Get('me')
@@ -46,12 +86,39 @@ export class AuthController {
     return this.authService.getMe(request.user.userId);
   }
 
+  @Get('visitor-me')
+  @UseGuards(JwtAuthGuard)
+  async getVisitorMe(@Request() request: any) {
+    return this.authService.getMe(request.user.userId);
+  }
+
+  @Get('staff-me')
+  @UseGuards(JwtAuthGuard)
+  async getStaffMe(@Request() request: any) {
+    return this.authService.getMe(request.user.userId);
+  }
+
   @Delete('logout')
-  logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie('accessToken', {
+  logout(
+    @Query('type') type: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    if (type !== 'visitor' && type !== 'staff') {
+      throw new UnauthorizedException(
+        'Specify the logout type: visitor or staff',
+      );
+    }
+
+    const cookieName =
+      type === 'visitor'
+        ? 'visitorAccessToken'
+        : 'staffAccessToken';
+
+    response.clearCookie(cookieName, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
+      path: '/',
     });
 
     return {

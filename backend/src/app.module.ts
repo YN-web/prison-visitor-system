@@ -8,8 +8,10 @@ import { InmateModule } from './inmate/inmate.module';
 import { PrisonModule } from './prison/prison.module';
 import { UserModule } from './user/user.module';
 import { ManagementModule } from './management/management.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { GateDutyModule } from './gate-duty/gate-duty.module';
 @Module({
-  imports: [PrismaModule, AuthModule,VisitModule, InmateModule ,PrisonModule, UserModule,ManagementModule,],
+  imports: [PrismaModule, AuthModule,VisitModule, InmateModule ,PrisonModule, UserModule,ManagementModule, NotificationsModule, GateDutyModule,],
   controllers: [AppController],
   providers: [AppService],
 

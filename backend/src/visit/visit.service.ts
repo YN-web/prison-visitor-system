@@ -245,4 +245,92 @@ async getMyVisitStats(userId: string) {
     rejected,
   };
 }
+
+async findPendingVisits() {
+  return this.prisma.visit.findMany({
+    where: {
+      status: 'PENDING',
+    },
+    include: {
+      visitor: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
+            },
+          },
+        },
+      },
+      inmate: true,
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+  });
+}
+
+async approveVisit(visitId: string, staffUserId: string) {
+  const visit = await this.prisma.visit.findUnique({
+    where: { id: visitId },
+  });
+
+  if (!visit) {
+    throw new NotFoundException('Visit not found');
+  }
+
+  if (visit.status !== 'PENDING') {
+    throw new BadRequestException(
+      'Only pending visit requests can be approved',
+    );
+  }
+
+  return this.prisma.visit.update({
+    where: { id: visitId },
+    data: {
+      status: 'APPROVED',
+      approvedById: staffUserId,
+      approvedAt: new Date(),
+      rejectionReason: null,
+    },
+    include: {
+      inmate: true,
+      visitor: true,
+    },
+  });
+}
+
+async rejectVisit(
+  visitId: string,
+  staffUserId: string,
+  rejectionReason: string,
+) {
+  const visit = await this.prisma.visit.findUnique({
+    where: { id: visitId },
+  });
+
+  if (!visit) {
+    throw new NotFoundException('Visit not found');
+  }
+
+  if (visit.status !== 'PENDING') {
+    throw new BadRequestException(
+      'Only pending visit requests can be rejected',
+    );
+  }
+
+  return this.prisma.visit.update({
+    where: { id: visitId },
+    data: {
+      status: 'REJECTED',
+      approvedById: staffUserId,
+      rejectionReason,
+    },
+    include: {
+      inmate: true,
+      visitor: true,
+    },
+  });
+}
 }
